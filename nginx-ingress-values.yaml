@@ -1,0 +1,12 @@
+controller:
+  metrics:
+    enabled: true
+    service:
+      annotations:
+        prometheus.io/scrape: true
+  nodeSelector:
+    beta.kubernetes.io/os: linux
+  replicaCount: 2
+defaultBackend:
+  nodeSelector:
+    beta.kubernetes.io/os: linux
