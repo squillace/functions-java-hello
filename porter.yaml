@@ -35,7 +35,7 @@ install:
       name: nginx
       chart: stable/nginx-ingress
       version: "1.26.2"
-      namespace: ingress
+      namespace: ingress-nginx
       replace: true
       values:
         - nginx-ingress-values.yaml
@@ -60,7 +60,7 @@ install:
       command: "bash"
       arguments:
         - "configure-dns-name.sh"
-        - ingress
+        - ingress-nginx
         - nginx
         - "{{ bundle.parameters.dns_name }}"
       outputs:
