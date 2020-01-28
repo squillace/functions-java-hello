@@ -81,6 +81,37 @@ install:
       manifests:
         - cluster-issuer.yaml
       wait: true
+  
+  - exec:
+      description: "Deploy Prometheus"
+      command: "bash"
+      arguments:
+        - "c"
+        - |
+          kubectl apply --kustomize github.com/kubernetes/ingress-nginx/deploy/prometheus/
+  
+  - exec:
+      description: "Add KEDA repo"
+      command: "bash"
+      arguments:
+        - "c"
+        - "helm repo add kedacore https://kedacore.github.io/charts"
+  - helm:
+      description: "Deploy KEDA"
+      name: keda
+      chart: kedacore/keda
+      version: "1.0.0"
+      namespace: keda
+      replace: true
+
+  - kubernetes:
+      description: "Create prometheus ingress and config"
+      manifests:
+        - prometheus-config.yaml
+        - ingress.yaml
+      wait: true
+
+        
 
 outputs:
   - name: fqdn

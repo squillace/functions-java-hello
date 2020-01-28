@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azure-function
+  labels:
+    app: azure-function
+spec:
+  selector:
+    matchLabels:
+      app: azure-function
+  template:
+    metadata:
+      labels:
+        app: azure-function
+    spec:
+      containers:
+      - name: function-http-v3
+        image: jeffhollan/function-http-v3
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: azure-function
+spec:
+  selector:
+    app: azure-function
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 80
+---
+apiVersion: keda.k8s.io/v1alpha1
+kind: ScaledObject
+metadata:
+  name: azure-function-scaledobject
+  namespace: default
+  labels:
+    deploymentName: azure-function
+spec:
+  scaleTargetRef:
+    deploymentName: azure-function
+  pollingInterval: 3  # Optional. Default: 30 seconds
+  cooldownPeriod:  5 # Optional. Default: 300 seconds
+  minReplicaCount: 1   # Optional. Default: 0
+  maxReplicaCount: 100 # Optional. Default: 100
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-server.ingress.svc.cluster.local:9090
+      metricName: nginx_ingress_controller_requests
+      threshold: '1'
+      query: sum(rate(nginx_ingress_controller_requests{service="azure-function"}[5s]))
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: azure-function-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  tls:
+  - hosts:
+    - function.hollan.dev
+    secretName: function-tls
+  rules:
+  - host: function.hollan.dev
+    http:
+      paths:
+      - backend:
+          serviceName: azure-function
+          servicePort: 80
