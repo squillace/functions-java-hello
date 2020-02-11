@@ -86,15 +86,15 @@ install:
       description: "Deploy Prometheus"
       command: "bash"
       arguments:
-        - "c"
+        - "-c"
         - |
-          kubectl apply --kustomize github.com/kubernetes/ingress-nginx/deploy/prometheus/
+          kubectl apply --kustomize ./prometheus/
   
   - exec:
       description: "Add KEDA repo"
       command: "bash"
       arguments:
-        - "c"
+        - "-c"
         - "helm repo add kedacore https://kedacore.github.io/charts"
   - helm:
       description: "Deploy KEDA"
@@ -105,10 +105,9 @@ install:
       replace: true
 
   - kubernetes:
-      description: "Create prometheus ingress and config"
+      description: "Create cert-manager config"
       manifests:
-        - prometheus-config.yaml
-        - ingress.yaml
+        - prod-cert-manager.yaml
       wait: true
 
         
