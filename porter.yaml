@@ -5,7 +5,7 @@
 
 name: AzFunctionEnvironment
 version: 0.1.0
-description: "An example Porter configuration"
+description: "A dev bundle that installs and uninstalls the Azure functions environment on a Kubernetes clusteris. This bundle removes the entire environment on uninstall, and so is intended only for developer-controlled clusters."
 invocationImage: porter-az-functions:v0.1.0
 tag: jeffhollan/porter-az-functions-bundle:v0.1.0
 
@@ -120,11 +120,76 @@ outputs:
     description: "Fully qualified domain name for the ingress controller" 
 
 uninstall:
-  - exec:
-      description: "Uninstall Azure Functions Environment"
-      command: bash
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
       flags:
-        c: echo I haven't implemented this yet.
+        service-principal: 
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+  - az: 
+      description: "Azure CLI set subscription"
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+  - helm:
+      description: "Delete KEDA"
+      purge: true
+      releases:
+        - keda
+  - exec:
+      command: kubectl
+      description: "Deleting Keda namespace..."
+      arguments:
+        - delete
+        - ns
+        - keda
+  - exec:
+      command: kubectl
+      description: "Removing KEDA CRDs...."
+      arguments:
+        - delete
+        - crds
+        - scaledobjects.keda.k8s.io
+        - triggerauthentications.keda.k8s.io
+  - exec:
+      description: "Delete Prometheus"
+      command: "kubectl"
+      arguments:
+        - delete
+        - --kustomize
+        - ./prometheus/
+  - kubernetes:
+      description: "Delete the CA cluster issuer"
+      manifests:
+        - cluster-issuer.yaml
+      wait: true
+  - exec:
+      description: "Delete cert-manager"
+      command: "bash"
+      arguments:
+        - "-c"
+        - kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/v0.12.0/cert-manager.yaml || true
+# needed at end         kubectl delete namespace cert-manager
+#          echo "Waiting for cert-manager to start running....."
+#        - kubectl wait pod --for=delete -l app=webhook -n cert-manager --timeout 300s
+  - helm:
+      description: "Deleting nginx release...."
+      purge: true
+      releases:
+        - nginx
+  - exec:
+      command: kubectl
+      description: "Deleting ingress-nginx namespace...."
+      arguments:
+        - delete
+        - ns
+        - ingress-nginx
+
 
 # See https://porter.sh/wiring/#credentials
 credentials:
