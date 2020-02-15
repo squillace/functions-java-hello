@@ -6,8 +6,8 @@
 name: AzFunctionEnvironment
 version: 0.1.0
 description: "A dev bundle that installs and uninstalls the Azure functions environment on a Kubernetes clusteris. This bundle removes the entire environment on uninstall, and so is intended only for developer-controlled clusters."
-invocationImage: porter-az-functions:v0.1.0
-tag: jeffhollan/porter-az-functions-bundle:v0.1.0
+invocationImage: jeffhollan/java-azure-functions:v0.1.0-kubernetes
+tag: jeffhollan/java-azure-functions-bundle:v0.1.0-kubernetes
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 #dockerfile: Dockerfile.tmpl
@@ -15,7 +15,7 @@ tag: jeffhollan/porter-az-functions-bundle:v0.1.0
 mixins:
   - exec
   - kubernetes
-  - helm
+  - helm3
   - az
 
 parameters:
@@ -30,15 +30,34 @@ parameters:
       env: LETSENCRYPT_EMAIL
 
 install:
-  - helm:
-      description: "Install nginx"
-      name: nginx
-      chart: stable/nginx-ingress
-      version: "1.26.2"
-      namespace: ingress-nginx
-      replace: true
-      values:
+  - exec:
+      description: "Create namespaces..."
+      command: "bash"
+      arguments:
+        - "-c"
+        - |
+          kubectl create namespace cert-manager
+          kubectl create namespace ingress-nginx
+          kubectl create namespace keda
+  - helm3:
+      description: "Add stable repo..."
+      arguments:
+        - repo
+        - add
+        - stable
+        - https://kubernetes-charts.storage.googleapis.com
+  - helm3:
+      description: "Installing nginx..."
+      arguments:
+        - install
+        - nginx
+        - stable/nginx-ingress
+        - -n
+        - ingress-nginx
+        - -f
         - nginx-ingress-values.yaml
+        - --version
+        - '1.26.2'
   - az: 
       description: "Azure CLI login"
       arguments: 
@@ -72,7 +91,6 @@ install:
       arguments:
         - "-c"
         - |
-          kubectl create namespace cert-manager
           kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.12.0/cert-manager.yaml
           echo "Waiting for cert-manager to start running....."
           kubectl wait pod --for=condition=Ready -l app=webhook -n cert-manager --timeout 300s
@@ -89,20 +107,21 @@ install:
         - "-c"
         - |
           kubectl apply --kustomize ./prometheus/
-  
-  - exec:
-      description: "Add KEDA repo"
-      command: "bash"
+  - helm3:
+      description: "Add kedacore repo..."
       arguments:
-        - "-c"
-        - "helm repo add kedacore https://kedacore.github.io/charts"
-  - helm:
+        - repo
+        - add
+        - kedacore
+        - https://kedacore.github.io/charts
+  - helm3:
       description: "Deploy KEDA"
-      name: keda
-      chart: kedacore/keda
-      version: "1.0.0"
-      namespace: keda
-      replace: true
+      arguments:
+        - install
+        - keda
+        - kedacore/keda
+        - --namespace
+        - keda
 
   - kubernetes:
       description: "Create cert-manager config"
@@ -120,26 +139,12 @@ outputs:
     description: "Fully qualified domain name for the ingress controller" 
 
 uninstall:
-  - az: 
-      description: "Azure CLI login"
-      arguments: 
-        - "login" 
-      flags:
-        service-principal: 
-        username: "{{ bundle.credentials.azure_client_id}}"
-        password: "{{ bundle.credentials.azure_client_secret}}"
-        tenant: "{{ bundle.credentials.azure_tenant_id}}"
-  - az: 
-      description: "Azure CLI set subscription"
-      arguments: 
-        - "account" 
-        - "set" 
-      flags:
-        subscription: "{{ bundle.credentials.azure_subscription_id}}"
-  - helm:
+  - helm3:
       description: "Delete KEDA"
-      purge: true
-      releases:
+      arguments:
+        - delete
+        - keda
+        - --namespace
         - keda
   - exec:
       command: kubectl
@@ -157,19 +162,19 @@ uninstall:
         - scaledobjects.keda.k8s.io
         - triggerauthentications.keda.k8s.io
   - exec:
-      description: "Delete Prometheus"
+      description: "Deleting Prometheus..."
       command: "kubectl"
       arguments:
         - delete
         - --kustomize
         - ./prometheus/
   - kubernetes:
-      description: "Delete the CA cluster issuer"
+      description: "Deleting the CA cluster issuer..."
       manifests:
         - cluster-issuer.yaml
       wait: true
   - exec:
-      description: "Delete cert-manager"
+      description: "Deleting cert-manager..."
       command: "bash"
       arguments:
         - "-c"
@@ -177,11 +182,13 @@ uninstall:
 # needed at end         kubectl delete namespace cert-manager
 #          echo "Waiting for cert-manager to start running....."
 #        - kubectl wait pod --for=delete -l app=webhook -n cert-manager --timeout 300s
-  - helm:
-      description: "Deleting nginx release...."
-      purge: true
-      releases:
+  - helm3:
+      description: "Deleting nginx release..."
+      arguments:
+        - delete
         - nginx
+        - --namespace
+        - ingress-nginx
   - exec:
       command: kubectl
       description: "Deleting ingress-nginx namespace...."
