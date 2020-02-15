@@ -1,0 +1,49 @@
+# This is the configuration for Porter
+# You must define steps for each action, but the rest is optional
+# See https://porter.sh/author-bundles for documentation on how to configure your bundle
+# Uncomment out the sections below to take full advantage of what Porter can do!
+
+name: java-function-app
+version: 0.1.0
+description: "A dev bundle that deploys an Azure Function container to Kubernetes."
+tag: getporter/porter-hello:v0.1.0
+
+# Uncomment the line below to use a template Dockerfile for your invocation image
+#dockerfile: Dockerfile.tmpl
+
+mixins:
+  - exec
+
+install:
+  - exec:
+      description: "Install Hello World"
+      command: bash
+      flags:
+        c: echo Hello World
+
+upgrade:
+  - exec:
+      description: "World 2.0"
+      command: bash
+      flags:
+        c: echo World 2.0
+
+uninstall:
+  - exec:
+      description: "Uninstall Hello World"
+      command: bash
+      flags:
+        c: echo Goodbye World
+
+
+# See https://porter.sh/author-bundles/#dependencies
+#dependencies:
+#  mysql:
+#    tag: getporter/mysql:v0.1.1
+#    parameters:
+#      database-name: wordpress
+
+# See https://porter.sh/wiring/#credentials
+#credentials:
+#  - name: kubeconfig
+#    path: /root/.kube/config
