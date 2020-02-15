@@ -5,6 +5,7 @@
 
 name: AzFunctionEnvironment
 version: 0.1.0
+dockerfile: Dockerfile.tmpl
 description: "A dev bundle that installs and uninstalls the Azure functions environment on a Kubernetes clusteris. This bundle removes the entire environment on uninstall, and so is intended only for developer-controlled clusters."
 invocationImage: jeffhollan/java-azure-functions:v0.1.0-kubernetes
 tag: jeffhollan/java-azure-functions-bundle:v0.1.0-kubernetes
@@ -30,15 +31,11 @@ parameters:
       env: LETSENCRYPT_EMAIL
 
 install:
-  - exec:
+  - kubernetes:
       description: "Create namespaces..."
-      command: "bash"
-      arguments:
-        - "-c"
-        - |
-          kubectl create namespace cert-manager
-          kubectl create namespace ingress-nginx
-          kubectl create namespace keda
+      manifests:
+        - namespace.yaml
+      wait: true
   - helm3:
       description: "Add stable repo..."
       arguments:
