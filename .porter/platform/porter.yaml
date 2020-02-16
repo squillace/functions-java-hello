@@ -3,12 +3,12 @@
 # See https://porter.sh/author-bundles for documentation on how to configure your bundle
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
-name: azure-function-environment-kubernetes
+name: azure-function-platform-kubernetes
 version: 0.1.0
 dockerfile: Dockerfile.tmpl
 description: "A dev bundle that installs and uninstalls the Azure functions environment on a Kubernetes cluster. This bundle removes the entire environment on uninstall, and so is intended only for developer-controlled clusters."
-invocationImage: jeffhollan/java-azure-functions:v0.1.0-kubernetes
-tag: jeffhollan/java-azure-functions-bundle:v0.1.0-kubernetes
+invocationImage: jeffhollan/azure-functions-platform:v0.1.0-kubernetes
+tag: jeffhollan/azure-functions-platform-bundle:v0.1.0-kubernetes
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 #dockerfile: Dockerfile.tmpl

@@ -1,0 +1,2 @@
+image_name=jeffhollan/java-azure-functions:v0.1
+host=jeff3-functions.westus2.cloudapp.azure.com

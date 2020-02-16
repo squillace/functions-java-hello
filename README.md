@@ -4,16 +4,29 @@
 * Docker
 * Porter
 
-## Deploying the bundle
+## Building and deploying the bundle
 
 ```bash
 # Clone the repo
 git clone https://github.com/jeffhollan/azure-functions-porter
+
+# Platform:
+# Navigate to platform bundle
+cd .porter/platform
 # Generate credentials
-porter credentials generate AzFunctionEnvironment --file .porter/infra/porter.yaml
+porter credentials generate AzFunctionEnvironment
+# Build the bundle
+porter build
 # Install the infra
-porter install -f .porter/infra/porter.yaml --param-file ./params.txt -c AzFunctionEnvironment
-# Install the app
+porter install --param-file ../../params.txt -c AzFunctionEnvironment
+
+# App:
+# Navigate to app bundle
+cd ../app
+# Build the bundle
+porter build
+# Install the infra
+porter install --param-file ../../params.txt -c AzFunctionEnvironment
 ```
 
 ## Building the bundle

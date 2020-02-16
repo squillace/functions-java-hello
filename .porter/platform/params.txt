@@ -1,3 +1,2 @@
 letsencrypt_email=jeffhollan@outlook.com
 dns_name=jeff3-functions
-java_app_container=jeffhollan/test-java-app:v0.1

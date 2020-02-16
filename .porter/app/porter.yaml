@@ -3,47 +3,61 @@
 # See https://porter.sh/author-bundles for documentation on how to configure your bundle
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
-name: java-function-app
+name: azure-function-app-kubernetes
 version: 0.1.0
-description: "A dev bundle that deploys an Azure Function container to Kubernetes."
-tag: getporter/porter-hello:v0.1.0
+dockerfile: Dockerfile.tmpl
+description: "A dev bundle that installs and uninstalls the Azure functions environment on a Kubernetes cluster. This bundle removes the entire environment on uninstall, and so is intended only for developer-controlled clusters."
+invocationImage: jeffhollan/azure-functions-app:v0.1.0-kubernetes
+tag: jeffhollan/azure-functions-app-bundle:v0.1.0-kubernetes
 
 # Uncomment the line below to use a template Dockerfile for your invocation image
 #dockerfile: Dockerfile.tmpl
 
 mixins:
   - exec
+  - kubernetes
+
+parameters:
+  - name: host
+    default: functions.westus2.cloudapp.azure.com
+    type: string
+    description: The full hostname for the site (likely the outputs of the platform install)
+  - name: image_name
+    default: jeffhollan/java-azure-functions:v0.1
+    type: string
+    description: The docker image for the Azure Function container
 
 install:
   - exec:
-      description: "Install Hello World"
-      command: bash
-      flags:
-        c: echo Hello World
-
-upgrade:
-  - exec:
-      description: "World 2.0"
-      command: bash
-      flags:
-        c: echo World 2.0
+      description: "Generate deployment...."
+      command: "bash"
+      arguments: 
+        - ./generate-deploy.sh
+        - "{{ bundle.parameters.host }}"
+        - "{{ bundle.parameters.image_name }}"
+  - kubernetes:
+      description: "Deploy function app..."
+      manifests:
+        - generated-deploy.yaml
+      wait: true
 
 uninstall:
-  - exec:
-      description: "Uninstall Hello World"
-      command: bash
-      flags:
-        c: echo Goodbye World
-
+  - kubernetes:
+      description: "Remove function app"
+      manifests:
+        - deploy.yaml
+      wait: true
 
 # See https://porter.sh/author-bundles/#dependencies
-#dependencies:
-#  mysql:
-#    tag: getporter/mysql:v0.1.1
+# dependencies:
+#  azure-functions-platform-kubernetes:
+#    tag: jeffhollan/azure-functions-platform:v0.1.0-kubernetes
 #    parameters:
-#      database-name: wordpress
+#      letsencrypt_email: email@address.com
+#      dns_name: sample-dns
 
 # See https://porter.sh/wiring/#credentials
-#credentials:
-#  - name: kubeconfig
-#    path: /root/.kube/config
+credentials:
+  - name: kubeconfig
+    path: /root/.kube/config
+    default: ~/.kube/config
