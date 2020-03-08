@@ -1,5 +1,5 @@
 {
-    "azureFunctions.deploySubpath": "target/azure-functions/java-azure-function-158180/",
+    "azureFunctions.deploySubpath": "target/azure-functions/java-function/",
     "azureFunctions.projectLanguage": "Java",
     "azureFunctions.projectRuntime": "~3",
     "debug.internalConsoleOptions": "neverOpen",
