@@ -1,0 +1,4 @@
+azure-functions-platform-kubernetes#letsencrypt_email=jeffhollan@outlook.com
+azure-functions-platform-kubernetes#dns_name=jehollan-testfunction
+image_name=jeffhollan/java-azure-functions:v0.1
+host=jehollan-testfunction.westus2.cloudapp.azure.com

@@ -49,12 +49,12 @@ uninstall:
       wait: true
 
 # See https://porter.sh/author-bundles/#dependencies
-# dependencies:
-#  azure-functions-platform-kubernetes:
-#    tag: jeffhollan/azure-functions-platform:v0.1.0-kubernetes
-#    parameters:
-#      letsencrypt_email: email@address.com
-#      dns_name: sample-dns
+dependencies:
+  azure-functions-platform-kubernetes:
+    tag: jeffhollan/azure-functions-platform-bundle:v0.1.0-kubernetes
+    parameters:
+      letsencrypt_email: "{{ bundle.parameters.letsencrypt_email }}"
+      dns_name: "{{ bundle.parameters.dns_name }}"
 
 # See https://porter.sh/wiring/#credentials
 credentials:
