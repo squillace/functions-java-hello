@@ -4,10 +4,10 @@
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
 name: azure-function-platform
-version: 0.1.0
-description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure."
-invocationImage: jeffhollan/azure-functions-app:v0.1.0
-tag: jeffhollan/azure-functions-app-bundle:v0.1.0
+version: 0.1.1
+description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure.."
+invocationImage: jeffhollan/azure-functions-app:v0.1.1
+tag: jeffhollan/azure-functions-app-bundle:v0.1.1
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 #dockerfile: Dockerfile.tmpl
@@ -50,6 +50,17 @@ install:
       flags:
         name: "{{ bundle.parameters.dns_name}}"
         location: "westus2"
+  - az:
+      description: "Creating the storage account...."
+      arguments:
+        - "storage"
+        - "account"
+        - "create"
+      flags:
+        name: "{{ bundle.parameters.dns_name}}"
+        location: "westus2"
+        resource-group: "{{ bundle.parameters.dns_name}}"
+        sku: "Standard_LRS"
   - az: 
       description: "Create function app"
       arguments: 
@@ -58,8 +69,8 @@ install:
       flags:
         name: "{{ bundle.parameters.dns_name}}"
         resource-group: "{{ bundle.parameters.dns_name}}"
-        storage-account: jehollantestfun
-        functions-version: 3
+        storage-account: "{{ bundle.parameters.dns_name}}"
+       # functions-version: 3
         consumption-plan-location: westus2
   - az: 
       description: "Deploy function app"
