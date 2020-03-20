@@ -11,6 +11,7 @@
 !/target/azure-functions/**
 !/.cnab/**
 !porter.yaml
+!Dockerfile
 #!/src/**
 
 # Ignore unnecessary files inside allowed directories

@@ -4,6 +4,8 @@ ARG BUNDLE_DIR
 
 RUN apt-get update && apt-get install -y ca-certificates
 
+RUN apt-get install curl -y
+
 # PORTER_MIXINS
 
 # This is a template Dockerfile for the bundle's invocation image

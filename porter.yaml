@@ -4,10 +4,10 @@
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
 name: azure-functions-java-hello
-version: 0.1.0
+version: 0.2.0
 description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure.."
-invocationImage: squillace/functions-java-hello-install:v0.1.0
-tag: squillace/functions-java-hello:v0.1.0
+invocationImage: squillace/functions-java-hello-install:v0.2.0
+tag: squillace/functions-java-hello:v0.2.0
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 dockerfile: Dockerfile.tmpl
@@ -15,17 +15,36 @@ dockerfile: Dockerfile.tmpl
 mixins:
   - exec
   - az
+  - jq
 
 parameters:
   - name: functionapp
     type: file
     path: /root/functionapp
+    applyTo:
+      - install,upgrade
   - name: dns_name
     default: jehollan-functionapp
     type: string
-    description: The full hostname for the site
+    description: "The hostname prefix for the site."
+    applyTo:
+      - install
+      - upgrade
+      - functions.java.hello.test
 
+customActions:
+  functions.java.hello.test:
+    description: "Tests the Azure Function using the dns-name value."
+    stateless: true
+    modifies: false
 
+outputs:
+- name: HOSTNAME
+  type: string
+  description: "The base DNS URL at which the function is hosted. Used as an input to the \"functions.hello.test\" action."
+  applyTo:
+    - install
+  
 install:
   - az: 
       description: "Azure CLI login"
@@ -73,6 +92,9 @@ install:
         storage-account: "{{ bundle.parameters.dns_name}}"
        # functions-version: 3
         consumption-plan-location: westus2
+      outputs: 
+        - name: "HOSTNAME"
+          jsonPath: 'defaultHostName'
   - az: 
       description: "Deploy function app"
       arguments: 
@@ -83,16 +105,41 @@ install:
       flags:
         name: "{{ bundle.parameters.dns_name}}"
         resource-group: "{{ bundle.parameters.dns_name}}"
-        src: ./target/azure-functions
+        src: /root/functionapp
+
+functions.java.hello.test: 
+  - exec:
+      command: bash
+      description: "cURLing the application...."
+      flags:
+        c: 'curl https://squillaceapp.azurewebsites.net/api/HttpTrigger | jq ". | {latitude, longitude, currently}"'
+
 
 uninstall:
-  - exec:
-      description: "Uninstall Function"
-      command: bash
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
       flags:
-        c: echo Have not implemented
-
-
+        service-principal: 
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+  - az: 
+      description: "Setting the Azure subscription...."
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+  - az:
+      description: "Deleting the Azure Function....."
+      arguments:
+        - "functionapp"
+        - "delete"
+      flags:
+        resource-group: "{{ bundle.parameters.dns_name}}"
+        name: "{{ bundle.parameters.dns_name}}"
 # See https://porter.sh/author-bundles/#dependencies
 #dependencies:
 #  mysql:
