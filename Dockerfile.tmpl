@@ -4,13 +4,7 @@ ARG BUNDLE_DIR
 
 RUN apt-get update && apt-get install -y ca-certificates
 
-# exec mixin has no buildtime dependencies
-
-RUN apt-get update && apt-get install -y apt-transport-https lsb-release gnupg curl
-RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/microsoft.asc.gpg
-RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" > /etc/apt/sources.list.d/azure-cli.list
-RUN apt-get update && apt-get install -y azure-cli
-
+# PORTER_MIXINS
 
 # This is a template Dockerfile for the bundle's invocation image
 # You can customize it to use different base images, install tools and copy configuration files.
@@ -27,8 +21,3 @@ RUN apt-get update && apt-get install -y azure-cli
 
 # Use the BUNDLE_DIR build argument to copy files into the bundle
 COPY . $BUNDLE_DIR
-RUN rm -fr $BUNDLE_DIR/.cnab
-COPY .cnab /cnab
-COPY porter.yaml $BUNDLE_DIR/porter.yaml
-WORKDIR $BUNDLE_DIR
-CMD ["/cnab/app/run"]

@@ -1,0 +1,115 @@
+# This is the configuration for Porter
+# You must define steps for each action, but the rest is optional
+# See https://porter.sh/author-bundles for documentation on how to configure your bundle
+# Uncomment out the sections below to take full advantage of what Porter can do!
+
+name: azure-functions-java-hello
+version: 0.1.0
+description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure.."
+invocationImage: squillace/functions-java-hello-install:v0.1.0
+tag: squillace/functions-java-hello:v0.1.0
+
+# Uncomment out the line below to use a template Dockerfile for your invocation image
+dockerfile: Dockerfile.tmpl
+
+mixins:
+  - exec
+  - az
+
+parameters:
+  - name: functionapp
+    type: file
+    path: /root/functionapp
+  - name: dns_name
+    default: jehollan-functionapp
+    type: string
+    description: The full hostname for the site
+
+
+install:
+  - az: 
+      description: "Azure CLI login"
+      arguments: 
+        - "login" 
+      flags:
+        service-principal: 
+        username: "{{ bundle.credentials.azure_client_id}}"
+        password: "{{ bundle.credentials.azure_client_secret}}"
+        tenant: "{{ bundle.credentials.azure_tenant_id}}"
+  - az: 
+      description: "Setting the Azure subscription...."
+      arguments: 
+        - "account" 
+        - "set" 
+      flags:
+        subscription: "{{ bundle.credentials.azure_subscription_id}}"
+  - az: 
+      description: "Create resource group"
+      arguments: 
+        - "group" 
+        - "create" 
+      flags:
+        name: "{{ bundle.parameters.dns_name}}"
+        location: "westus2"
+  - az:
+      description: "Creating the storage account...."
+      arguments:
+        - "storage"
+        - "account"
+        - "create"
+      flags:
+        name: "{{ bundle.parameters.dns_name}}"
+        location: "westus2"
+        resource-group: "{{ bundle.parameters.dns_name}}"
+        sku: "Standard_LRS"
+  - az: 
+      description: "Create function app"
+      arguments: 
+        - "functionapp" 
+        - "create" 
+      flags:
+        name: "{{ bundle.parameters.dns_name}}"
+        resource-group: "{{ bundle.parameters.dns_name}}"
+        storage-account: "{{ bundle.parameters.dns_name}}"
+       # functions-version: 3
+        consumption-plan-location: westus2
+  - az: 
+      description: "Deploy function app"
+      arguments: 
+        - "functionapp" 
+        - "deployment"
+        - "source" 
+        - "config-zip"
+      flags:
+        name: "{{ bundle.parameters.dns_name}}"
+        resource-group: "{{ bundle.parameters.dns_name}}"
+        src: /root/functionapp
+
+uninstall:
+  - exec:
+      description: "Uninstall Function"
+      command: bash
+      flags:
+        c: echo Have not implemented
+
+
+# See https://porter.sh/author-bundles/#dependencies
+#dependencies:
+#  mysql:
+#    tag: deislabs/porter-mysql:latest
+#    parameters:
+#      database-name: wordpress
+
+credentials:
+  - name: azure_client_id
+    env: AZURE_CLIENT_ID
+    description: AAD Client ID for Azure account authentication - used for Az CLI
+  - name: azure_tenant_id
+    env: AZURE_TENANT_ID
+    description: Azure AAD Tenant Id for Azure account authentication  - used for Az CLI
+  - name: azure_client_secret
+    env: AZURE_CLIENT_SECRET
+    description: AAD Client Secret for Azure account authentication - used for Az CLI
+  - name: azure_subscription_id
+    env: AZURE_SUBSCRIPTION_ID
+    description: Azure Subscription Id used to set the subscription where the account has access to multiple subscriptions
