@@ -6,10 +6,11 @@
 # Ignore everything
 **
 
+
 # Allow files and directories
 !/target/azure-functions/**
-!/.cnab
-porter.yaml
+!/.cnab/**
+!porter.yaml
 #!/src/**
 
 # Ignore unnecessary files inside allowed directories

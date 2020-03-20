@@ -83,7 +83,7 @@ install:
       flags:
         name: "{{ bundle.parameters.dns_name}}"
         resource-group: "{{ bundle.parameters.dns_name}}"
-        src: /root/functionapp
+        src: ./target/azure-functions
 
 uninstall:
   - exec:
