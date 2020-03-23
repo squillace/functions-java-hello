@@ -4,10 +4,10 @@
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
 name: azure-functions-java-hello
-version: 0.2.0
+version: 0.3.0
 description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure.."
-invocationImage: squillace/functions-java-hello-install:v0.2.0
-tag: squillace/functions-java-hello:v0.2.0
+invocationImage: squillace/functions-java-hello-install:v0.3.0
+tag: squillace/functions-java-hello:v0.3.0
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 dockerfile: Dockerfile.tmpl
@@ -19,17 +19,28 @@ mixins:
 
 parameters:
   - name: functionapp
+    description: "The path to the .zip file to install."
     type: file
     path: /root/functionapp
     applyTo:
-      - install,upgrade
-  - name: dns_name
-    default: jehollan-functionapp
-    type: string
-    description: "The hostname prefix for the site."
-    applyTo:
       - install
       - upgrade
+  - name: function_name
+    description: "The name of the function."
+    type: string
+    applyTo:
+      - install
+      - uninstall
+  - name: resource_group
+    description: "The resource group in which to create your functions."
+    type: string
+    applyTo:
+      - install
+      - uninstall
+  - name: test_url
+    type: string
+    description: "The url to use in testing. Can be obtained by \"porter show azure-functions-java-hello -o json | jq -r \'.outputs.HOSTNAME\'\""
+    applyTo:
       - functions.java.hello.test
 
 customActions:
@@ -68,7 +79,7 @@ install:
         - "group" 
         - "create" 
       flags:
-        name: "{{ bundle.parameters.dns_name}}"
+        name: "{{ bundle.parameters.resource_group}}"
         location: "westus2"
   - az:
       description: "Creating the storage account...."
@@ -77,9 +88,9 @@ install:
         - "account"
         - "create"
       flags:
-        name: "{{ bundle.parameters.dns_name}}"
+        name: "{{ bundle.parameters.function_name}}"
         location: "westus2"
-        resource-group: "{{ bundle.parameters.dns_name}}"
+        resource-group: "{{ bundle.parameters.resource_group}}"
         sku: "Standard_LRS"
   - az: 
       description: "Create function app"
@@ -87,9 +98,9 @@ install:
         - "functionapp" 
         - "create" 
       flags:
-        name: "{{ bundle.parameters.dns_name}}"
-        resource-group: "{{ bundle.parameters.dns_name}}"
-        storage-account: "{{ bundle.parameters.dns_name}}"
+        name: "{{ bundle.parameters.function_name}}"
+        resource-group: "{{ bundle.parameters.resource_group}}"
+        storage-account: "{{ bundle.parameters.function_name}}"
        # functions-version: 3
         consumption-plan-location: westus2
       outputs: 
@@ -103,8 +114,8 @@ install:
         - "source" 
         - "config-zip"
       flags:
-        name: "{{ bundle.parameters.dns_name}}"
-        resource-group: "{{ bundle.parameters.dns_name}}"
+        name: "{{ bundle.parameters.function_name}}"
+        resource-group: "{{ bundle.parameters.resource_group}}"
         src: /root/functionapp
 
 functions.java.hello.test: 
@@ -112,7 +123,7 @@ functions.java.hello.test:
       command: bash
       description: "cURLing the application...."
       flags:
-        c: 'curl https://squillaceapp.azurewebsites.net/api/HttpTrigger | jq ". | {latitude, longitude, currently}"'
+        c: 'curl "{{bundle.parameters.test_url}}/api/HttpTrigger" | jq ". | {latitude, longitude, currently}"'
 
 
 uninstall:
@@ -138,8 +149,9 @@ uninstall:
         - "functionapp"
         - "delete"
       flags:
-        resource-group: "{{ bundle.parameters.dns_name}}"
-        name: "{{ bundle.parameters.dns_name}}"
+        resource-group: "{{ bundle.parameters.resource_group}}"
+        name: "{{ bundle.parameters.function_name}}"
+
 # See https://porter.sh/author-bundles/#dependencies
 #dependencies:
 #  mysql:
