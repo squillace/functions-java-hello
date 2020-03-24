@@ -4,10 +4,10 @@
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
 name: azure-functions-java-hello
-version: 0.3.0
+version: 0.4.0
 description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure.."
-invocationImage: squillace/functions-java-hello-install:v0.3.0
-tag: squillace/functions-java-hello:v0.3.0
+invocationImage: squillace/functions-java-hello-install:v0.4.0
+tag: squillace/functions-java-hello:v0.4.0
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 dockerfile: Dockerfile.tmpl
@@ -38,8 +38,8 @@ parameters:
       - install
       - uninstall
   - name: test_url
-    type: string
     description: "The url to use in testing. Can be obtained by \"porter show azure-functions-java-hello -o json | jq -r \'.outputs.HOSTNAME\'\""
+    type: string
     applyTo:
       - functions.java.hello.test
 
@@ -101,7 +101,7 @@ install:
         name: "{{ bundle.parameters.function_name}}"
         resource-group: "{{ bundle.parameters.resource_group}}"
         storage-account: "{{ bundle.parameters.function_name}}"
-       # functions-version: 3
+        functions-version: 3
         consumption-plan-location: westus2
       outputs: 
         - name: "HOSTNAME"
