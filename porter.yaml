@@ -5,7 +5,7 @@
 
 name: azure-functions-java-hello
 version: 0.4.0
-description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure.."
+description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure..."
 invocationImage: squillace/functions-java-hello-install:v0.4.0
 tag: squillace/functions-java-hello:v0.4.0
 
