@@ -42,8 +42,7 @@ parameters:
     description: "The version of the Azure Function runtime. The default is 3."
     default: "3"
   - name: test_url
-    description: |+ 
-      The url to use in testing. Can be obtained by "porter show azure-functions-java-hello -o json | jq -r '.outputs.HOSTNAME'"
+    description: "The url to use in testing. Can be obtained by \"porter show azure-functions-java-hello -o json | jq -r \'.outputs.HOSTNAME\'\""
     type: string
     applyTo:
       - functions.java.hello.test
