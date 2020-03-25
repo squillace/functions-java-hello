@@ -45,7 +45,7 @@ parameters:
 
 customActions:
   functions.java.hello.test:
-    description: "Tests the Azure Function using the dns-name value."
+    description: "Tests the Azure Function using the test_url value."
     stateless: true
     modifies: false
 
