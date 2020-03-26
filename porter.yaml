@@ -4,10 +4,10 @@
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
 name: azure-functions-java-hello
-version: 0.4.5
+version: 0.4.6
 description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure..."
-invocationImage: squillace/functions-java-hello-install:v0.4.5
-tag: squillace/functions-java-hello:v0.4.5
+invocationImage: squillace/functions-java-hello-install:v0.4.6
+tag: squillace/functions-java-hello:v0.4.6
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 dockerfile: Dockerfile.tmpl
@@ -56,7 +56,7 @@ customActions:
 outputs:
 - name: HOSTNAME
   type: string
-  description: "The base DNS URL at which the function is hosted. Used as an input to the \"functions.hello.test\" action."
+  description: "The base DNS address at which the function is hosted. Used as an input to the \"functions.hello.test\" action."
   applyTo:
     - install
   
