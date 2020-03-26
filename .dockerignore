@@ -5,6 +5,7 @@
 
 # Ignore everything
 **
+.git/**
 /src/**
 
 
