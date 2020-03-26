@@ -5,6 +5,7 @@
 
 # Ignore everything
 **
+/src/**
 
 
 # Allow files and directories
