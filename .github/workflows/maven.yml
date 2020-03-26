@@ -28,8 +28,17 @@ jobs:
         DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
+        echo "Removing several directories until dockerignore regression is fixed."
         rm -rf .git/ 
         rm -rf src/
+        rm -rf generated-sources/
+        rm java-azure-function-1.0-SNAPSHOT.jar
+        rm -rf maven-status
+        rm -rf test-classes
+        rm -rf classes
+        rm -rf generated-test-sources
+        rm -rf maven-archiver
+        rm -rf surefire-reports
         echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
         curl https://deislabs.blob.core.windows.net/porter/latest/install-linux.sh | bash
         PATH=$PATH:~/.porter
