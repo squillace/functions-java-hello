@@ -21,20 +21,20 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
-
-  porter:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: Build 
+      run: |
+        mvn -B package --file pom.xml
+    - name: CNAB Bundle with porter
       env:
         DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
+        rm -rf .git/ 
+        rm -rf src/
         echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
         curl https://deislabs.blob.core.windows.net/porter/latest/install-linux.sh | bash
         PATH=$PATH:~/.porter
         porter mixins install jq --url https://github.com/squillace/porter-jq/releases/download --version v0.1.0
         porter build
         porter publish
+
+
