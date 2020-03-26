@@ -32,7 +32,6 @@ jobs:
         rm -rf .git/ 
         rm -rf src/
         rm -rf generated-sources/
-        rm java-azure-function-1.0-SNAPSHOT.jar
         rm -rf maven-status
         rm -rf test-classes
         rm -rf classes
