@@ -23,21 +23,15 @@ jobs:
     - name: Build with Maven
       run: |
         mvn -B package --file pom.xml
+    - name: Zip the function for CNAB bundle
+      run: | 
+        pushd target/azure-functions/java-function; zip -r ../../../zip.zip .; popd
     - name: CNAB Bundle with porter
       env:
         DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
-        echo "Removing several directories until dockerignore regression is fixed."
-        rm -rf .git/ 
-        rm -rf src/
-        rm -rf generated-sources/
-        rm -rf maven-status
-        rm -rf test-classes
-        rm -rf classes
-        rm -rf generated-test-sources
-        rm -rf maven-archiver
-        rm -rf surefire-reports
+        echo "Installing Porter and Porter mixins to build and publish."
         echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
         curl https://deislabs.blob.core.windows.net/porter/latest/install-linux.sh | bash
         PATH=$PATH:~/.porter

@@ -4,10 +4,10 @@
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
 name: azure-functions-java-hello
-version: 0.4.6
+version: 0.5.0
 description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure..."
-invocationImage: squillace/functions-java-hello-install:v0.4.6
-tag: squillace/functions-java-hello:v0.4.6
+invocationImage: squillace/functions-java-hello-install:v0.5.0
+tag: squillace/functions-java-hello:v0.5.0
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 dockerfile: Dockerfile.tmpl
@@ -23,7 +23,6 @@ parameters:
     type: file
     path: /root/functionapp
     applyTo:
-      - install
       - upgrade
   - name: function_name
     description: "The name of the function."
@@ -59,6 +58,7 @@ outputs:
   description: "The base DNS address at which the function is hosted. Used as an input to the \"functions.hello.test\" action."
   applyTo:
     - install
+
   
 install:
   - az: 
@@ -120,14 +120,20 @@ install:
       flags:
         name: "{{ bundle.parameters.function_name}}"
         resource-group: "{{ bundle.parameters.resource_group}}"
-        src: /root/functionapp
+        src: zip.zip
 
 functions.java.hello.test: 
   - exec:
       command: bash
-      description: "cURLing the application...."
+      description: "cURLing the application to test PUTting and GETting..."
       flags:
-        c: 'curl "{{bundle.parameters.test_url}}/api/HttpTrigger" | jq ". | {latitude, longitude, currently}"'
+        c: '"curl -s {{bundle.parameters.test_url}}/api/HttpTrigger > test.output"'
+
+  - jq: 
+      description: "Fetching out a latitude, longitude, and currently..."
+      arguments:
+        - '. | {latitude, longitude, currently}'
+        - test.output
 
 
 uninstall:
