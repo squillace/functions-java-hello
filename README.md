@@ -28,4 +28,29 @@ Alternatively, you can do this all yourself by cloning it to your organization, 
 
 ### Local 
 
+The following steps are necessary to use the repository with a local development environment. 
+
+Prerequisites: 
+1. `java -version` should be OpenJDK version 11.0.6 or greater (to build the application)
+2. `maven` installation (to build the application)
+3. `porter` (from https://porter.sh) to build the bundle
+4. a code editor of some form.
+5. git
+
+Cloning, building, and pushing the application requires the following steps:
+
+1. clone the template repo by clicking on the 
+2. add docker secrets to it
+3. git clone locally
+4. modify the invocationImage and tag registry names to yours
+5. build the app: mvn package
+6. test the app: F5 which launches java and function runtime  (requires some extensions that are checked in)
+7. build the bundle: porter build (requires porter locally)
+8. install, test, and uninstall the local bundle
+9. git add porter.yaml changes, and any app changes
+10.	git push origin master
+11.	Navigate to the Actions tab for your repository to watch the build function.
+
+
+
 
