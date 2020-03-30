@@ -23,6 +23,7 @@ jobs:
     - name: Build with Maven
       run: |
         mvn -B package --file pom.xml
+        java -version
     - name: Zip the function for CNAB bundle
       run: | 
         pushd target/azure-functions/java-function; zip -r ../../../zip.zip .; popd
