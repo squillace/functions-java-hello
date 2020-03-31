@@ -1,0 +1,13 @@
+{
+    "dockerFile": "Dockerfile",
+    "extensions": [
+        "ms-vscode.vscode-node-azure-pack",
+        "ms-azuretools.vscode-docker",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "ms-kubernetes-tools.vscode-aks-tools",
+        "ms-vscode.azurecli",
+        "vscjava.vscode-java-debug",
+        "ms-azuretools.vscode-azurefunctions"
+    ],
+    "postCreateCommand": "/bin/bash ./.devcontainer/setup.sh > ~/workspace/setup.log"
+}

@@ -26,6 +26,8 @@ Alternatively, you can do this all yourself by cloning it to your organization, 
 
 ### VS Code Online
 
+[![Open in Visual Studio Online](https://img.shields.io/endpoint?style=social&url=https%3A%2F%2Faka.ms%2Fvso-badge)](https://online.visualstudio.com/environments/new?name=functions-java-hello&repo=squillace/functions-java-hello)
+
 ### Local 
 
 The following steps are necessary to use the repository with a local development environment. 
