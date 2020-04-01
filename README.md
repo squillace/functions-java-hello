@@ -6,9 +6,9 @@
 
 You can deploy the bundle directly by creating the credentials needed to pass to the bundle and then installing the bundle. 
 
-1. To view the bundle's parameter and credential requirements, you can type `porter explain --tag squillace/functions-java-hello:v0.5.2` 
-2. To generate your local copy of credentials needed to install the bundle, type `porter creds generate functions --tag squillace/functions-java-hello:v0.5.2`
-3. To install the bundle, type `porter install -c functions --tag squillace/functions-java-hello:v0.5.2 --param resource_group=java-functions --param function_name=mytestfunction`
+1. To view the bundle's parameter and credential requirements, you can type `porter explain --tag squillace/functions-java-hello:v0.5.5` 
+2. To generate your local copy of credentials needed to install the bundle, type `porter creds generate functions --tag squillace/functions-java-hello:v0.5.5`
+3. To install the bundle, type `porter install -c functions --tag squillace/functions-java-hello:v0.5.5 --param resource_group=java-functions --param function_name=mytestfunction`
 
 To see the output of the `install` action, type `porter show azure-functions-java-hello`; the function's URL will be displayed along with the deployment log.
 
