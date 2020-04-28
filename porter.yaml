@@ -25,7 +25,7 @@ parameters:
       - install
     default: southcentralus
   - name: functionapp
-    description: "The path to the .zip file to install."
+    description: "The path to the .zip file to install. This is only for an upgrade action."
     type: file
     path: /root/functionapp
     applyTo:
