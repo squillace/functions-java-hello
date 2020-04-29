@@ -34,7 +34,7 @@ jobs:
       run: |
         echo "Installing Porter and Porter mixins to build and publish."
         echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-        curl https://deislabs.blob.core.windows.net/porter/latest/install-linux.sh | bash
+        curl https://deislabs.blob.core.windows.net/porter/canary/install-linux.sh | bash
         PATH=$PATH:~/.porter
         porter mixins install jq --url https://github.com/squillace/porter-jq/releases/download --version v0.1.0
         porter build
