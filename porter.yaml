@@ -4,10 +4,10 @@
 # Uncomment out the sections below to take full advantage of what Porter can do!
 
 name: azure-functions-java-hello
-version: 0.5.6
+version: 0.5.7
 description: "A dev bundle that installs and uninstalls the Azure functions environment in Azure...."
-invocationImage: squillace/functions-java-hello-install:v0.5.6
-tag: squillace/functions-java-hello:v0.5.6
+invocationImage: squillace/functions-java-hello-install:v0.5.7
+tag: squillace/functions-java-hello:v0.5.7
 
 # Uncomment out the line below to use a template Dockerfile for your invocation image
 dockerfile: Dockerfile.tmpl
@@ -72,6 +72,7 @@ install:
       arguments: 
         - "login" 
       flags:
+        service-principal:
         username: "{{ bundle.credentials.azure_client_id}}"
         password: "{{ bundle.credentials.azure_client_secret}}"
         tenant: "{{ bundle.credentials.azure_tenant_id}}"
