@@ -72,7 +72,6 @@ install:
       arguments: 
         - "login" 
       flags:
-        service-principal: 
         username: "{{ bundle.credentials.azure_client_id}}"
         password: "{{ bundle.credentials.azure_client_secret}}"
         tenant: "{{ bundle.credentials.azure_tenant_id}}"
