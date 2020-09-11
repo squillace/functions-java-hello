@@ -30,7 +30,7 @@ Alternatively, you can do this all yourself by cloning it to your organization, 
 
 ### Local 
 
-The following steps are necessary to use the repository with a local development environment. 
+The following steps are necessary to use the repository with a local development environment:
 
 Prerequisites: 
 1. `java -version` should be OpenJDK version 11.0.6 or greater (to build the application)
